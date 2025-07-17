@@ -1,26 +1,51 @@
-import { useState} from "react";
+import { useState, useEffect} from "react";
 import MovieCard from '../components/movieUI'
 import '../styles/Home.css'
+import {getPopularMovies, getSearchResults} from '../services/api.js'
+
 
 function Home() {
     
     const [searchQuery, setSearchValue] = useState("")
-/*    const [movies, getMovies] = useState([])
-    const [loading, loadMovies] = useState(true)
+    const [movies, setMovies] = useState([])
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-*/
-    const handleSearch = (e) => {
+
+    const handleSearch = async (e) => {
         e.preventDefault()
 
+        if(!searchQuery.trim()) return
+        if(loading) return
+        
+        setLoading(true)
+
+        try{
+
+            const searchResults = await getSearchResults(searchQuery)
+            setMovies(searchResults)
+            setError(null)
+        }catch(err){
+            console.log(err)
+        }finally{
+            setLoading(false)
+        }
+    
     };
 
-    const movies = [
-        { id: 1, title: 'John Wick', release: 2014, url: 'https://m.media-amazon.com/images/I/81w+3k4U5PL._AC_SY679_.jpg' },
-        { id: 2, title: 'Inception', release: 2010, url: 'https://m.media-amazon.com/images/I/51s+z1p1QGL._AC_.jpg' },
-        { id: 3, title: 'The Matrix', release: 1999, url: 'https://m.media-amazon.com/images/I/51EG732BV3L.jpg' },
-        { id: 4, title: 'Interstellar', release: 2014, url: 'https://m.media-amazon.com/images/I/91kFYg4fX3L._AC_SY679_.jpg' },
-        { id: 5, title: 'Parasite', release: 2019, url: 'https://m.media-amazon.com/images/I/91n6K9XK6-L._AC_SY679_.jpg' },
-    ];
+    useEffect( () => {
+        const loadPopularMovies = async () => {
+            try{
+                const popularMovies = await getPopularMovies();
+                setMovies(popularMovies);
+            }catch(err){
+                setError(err)
+                console.log("Error occured \n failed to load...");
+            }finally{
+                setLoading(false);
+            }
+        }
+        loadPopularMovies()   
+    },    [])
 
     return (
         <div className="home">
@@ -36,20 +61,24 @@ function Home() {
                 <button className="search-button" type="submit">SEARCH</button>
             </form>
 
+        {error && <div className="error-message">{error}</div>}
 
+        { loading ? (
+            <div className="loading">Loading </div>
+        ) : (
+            <div className="movies-grid">
+                {
+                movies.map(movie =>
+                <MovieCard key={movie.id} movie={movie} />
+                )}
+            </div>
+        )
+    }
 
-        <div className="movie-grid">
-        {
-            movies.map(movie => (
-              movie.title.toLowerCase().startsWith(searchQuery) && <MovieCard key={movie.id} movie={movie} />
-            ))
-        }
-        </div>
-
-        </div> 
-   )
-
+        
+    </div>
+   
+    )
 }
-
 
 export default Home
