@@ -2,6 +2,10 @@
 
 A movie search and favorites app built with React + Vite.
 
+## Live Demo
+
+[https://react-movie-ui.vercel.app](https://react-movie-ui.vercel.app)
+
 ## Features
 
 - Search movies
