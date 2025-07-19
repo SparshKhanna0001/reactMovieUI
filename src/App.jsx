@@ -4,10 +4,11 @@ import Home from './pages/home';
 import Favourites from './pages/favourites';
 import NavBar from './components/NavBar';
 import By10  from './components/by10';
+import { MovieProvider } from './context/MovieContext';
 
 function App() {
   return (
-  <div>
+  <MovieProvider>
     <NavBar />
     
     <main className='main-content'>
@@ -18,7 +19,7 @@ function App() {
         <Route path='/10' element={<By10 />} />
     </Routes>
     </main>
-  </div>
+  </MovieProvider>
   );
 
 }
